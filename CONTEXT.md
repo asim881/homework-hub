@@ -41,31 +41,27 @@ All browser → Anthropic API calls go through the Apps Script proxy. Fetch requ
 ### File structure
 ```
 Homework Hub/
-├── PROD/                         # Deploy-ready files — served via GitHub Pages
-│   ├── homework-hub-v2.html      # Main kids app
-│   ├── parent-dashboard.html     # Parent progress dashboard
-│   ├── apps-script-proxy.js      # Google Apps Script code
-│   └── architecture.html         # Visual architecture diagram
-├── DEV/                          # Working copies — test locally before promoting
-│   ├── homework-hub-v2.html
-│   ├── parent-dashboard.html
-│   └── apps-script-proxy.js
-├── index.html                    # Root redirect → PROD/homework-hub-v2.html (GitHub Pages)
+├── index.html                    # Kids app (was homework-hub-v2.html) — served at asim881.github.io/homework-hub/
+├── parent-dashboard.html         # Parent progress dashboard
+├── apps-script-proxy.js          # Google Apps Script code (paste into script.google.com)
+├── architecture.html             # Visual architecture diagram
 ├── CLAUDE_CODE_PROMPT.md
 └── CONTEXT.md                    # This file
 ```
 
-**Dev workflow:** Edit DEV/ → test by opening HTML directly in browser (proxy URL works from file://) → copy to PROD/ → commit and push to GitHub → GitHub Pages deploys automatically.
+**Why flat structure:** DEV/PROD folders were created for the Google Sites era — no version control meant PROD was the safety net and DEV was the working copy. Git makes both redundant: version history replaces PROD, branches replace DEV.
+
+**Dev workflow:** Edit files directly → test by opening in browser (proxy URL works from file://) → commit and push → GitHub Pages deploys automatically (~60 seconds).
 
 **Live URLs:**
 - Kids app: https://asim881.github.io/homework-hub/
-- Parent dashboard: https://asim881.github.io/homework-hub/PROD/parent-dashboard.html
+- Parent dashboard: https://asim881.github.io/homework-hub/parent-dashboard.html
 
 **GitHub repo:** https://github.com/asim881/homework-hub (public)
-**Hosting:** GitHub Pages from main branch / root. index.html redirects to PROD/homework-hub-v2.html.
+**Hosting:** GitHub Pages from main branch / root. index.html is the kids app directly — no redirect needed.
 **Why GitHub Pages:** Google Sites embedded HTML via a randomly-numbered atari-embeds.googleusercontent.com subdomain that changed every browser tab — incompatible with Family Link whitelisting.
 
-### Key constants in PROD/homework-hub-v2.html
+### Key constants in index.html
 ```javascript
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbxB-.../exec'; // Apps Script URL
 const FALLBACK_API_KEY = ''; // Intentionally empty — proxy is sole API path
