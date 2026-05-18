@@ -208,7 +208,7 @@
 <body>
 
 <h1>Homework Hub — Architecture & Data Flow</h1>
-<p class="subtitle">Reference document · Last updated May 2026</p>
+<p class="subtitle">Reference document · Last updated 2026-05-18 · Hosted on GitHub Pages</p>
 
 <!-- ══════════════════════════════════════
      SECTION 1: ARCHITECTURE DIAGRAM
@@ -235,9 +235,9 @@
     </div>
 
     <div class="comp">
-      <div class="comp-name">Google Sites</div>
-      <div class="comp-desc">Hosts both HTML files as iframes — no server needed, works on any Chromebook</div>
-      <span class="tag tag-google">Google</span>
+      <div class="comp-name">GitHub Pages</div>
+      <div class="comp-desc">Hosts both HTML files at asim881.github.io/homework-hub — stable domain, works on any Chromebook, no Family Link issues</div>
+      <span class="tag tag-cloud">GitHub · Free · Stable URL</span>
     </div>
   </div>
 
@@ -438,13 +438,12 @@
 
   <div class="why-card">
     <div class="why-card-title">Why a Single HTML File?</div>
-    <div class="why-card-sub">Simplicity and Google Sites compatibility</div>
-    <div class="why-point">Google Sites only supports HTML embeds — no npm, no build tools</div>
-    <div class="why-point">No deployment pipeline — edit the file, copy-paste into Sites</div>
+    <div class="why-card-sub">Simplicity over frameworks</div>
+    <div class="why-point">No npm, no build tools — edit and push, GitHub Pages serves it instantly</div>
     <div class="why-point">Works on any Chromebook out of the box</div>
     <div class="why-point">Easy to share, inspect, and modify in future</div>
-    <div class="why-bad">Alternative (React/Next.js app) would need a host, domain, and build process</div>
-    <div class="why-bad">Alternative (Google Sites native) has very limited interactivity</div>
+    <div class="why-point">DEV/ for local testing, PROD/ for deployment — simple two-folder workflow</div>
+    <div class="why-bad">Alternative (React/Next.js app) would need a build pipeline and more complexity</div>
   </div>
 
   <div class="why-card">
@@ -469,14 +468,13 @@
   </div>
 
   <div class="why-card">
-    <div class="why-card-title">Why Google Sites?</div>
-    <div class="why-card-sub">Hosting</div>
-    <div class="why-point">Free, no domain or hosting costs</div>
-    <div class="why-point">Kids access it like any website — just a bookmark</div>
-    <div class="why-point">Works within Family Link approved sites</div>
-    <div class="why-point">Shareable link works for wife and any device</div>
-    <div class="why-bad">Limitation: HTML embed size constraints (iframe height fixed)</div>
-    <div class="why-bad">Limitation: can't run server-side code — hence the Apps Script proxy</div>
+    <div class="why-card-title">Why GitHub Pages?</div>
+    <div class="why-card-sub">Hosting — replaced Google Sites May 2026</div>
+    <div class="why-point">Free, stable URL (asim881.github.io) — add once to Family Link, works forever</div>
+    <div class="why-point">Deploys automatically on every git push — no manual copy-paste</div>
+    <div class="why-point">Full version history via git — roll back any change instantly</div>
+    <div class="why-point">Kids access via bookmark, works on any Chromebook</div>
+    <div class="why-bad">Google Sites discarded: its embed domain got a new random numeric prefix on every browser tab, making Family Link whitelisting impossible</div>
   </div>
 
 </div>
