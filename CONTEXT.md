@@ -12,10 +12,12 @@
 - ✅ Progress syncs to Google Sheets (Overview + per-kid tabs + weekly summaries)
 - ✅ Parent dashboard PIN-gated (PIN: 3090) and auto-refreshing
 - ✅ Hardcoded API key removed — proxy is sole API path
-- ✅ Feature backlog tracked in Notion
+- ✅ Feature backlog tracked in Notion (with Commit field for version tracing)
+- ✅ Hosted on GitHub Pages — no more Family Link atari-embeds prompt
+- ✅ Version controlled in git (github.com/asim881/homework-hub)
 - ⚠️ Apps Script needs redeployment (code changes not yet live — causing "Failed to fetch")
 - ⚠️ Old Anthropic API key (sk-ant-api03-Y89b-Xf_...) needs rotating in Anthropic console
-- ⚠️ Family Link approval prompt still appearing intermittently (parked)
+- ⚠️ Add asim881.github.io to Family Link approved sites for each kid
 
 ---
 
@@ -39,7 +41,7 @@ All browser → Anthropic API calls go through the Apps Script proxy. Fetch requ
 ### File structure
 ```
 Homework Hub/
-├── PROD/                         # Files to deploy to Google Sites / Apps Script
+├── PROD/                         # Deploy-ready files — served via GitHub Pages
 │   ├── homework-hub-v2.html      # Main kids app
 │   ├── parent-dashboard.html     # Parent progress dashboard
 │   ├── apps-script-proxy.js      # Google Apps Script code
@@ -48,11 +50,20 @@ Homework Hub/
 │   ├── homework-hub-v2.html
 │   ├── parent-dashboard.html
 │   └── apps-script-proxy.js
+├── index.html                    # Root redirect → PROD/homework-hub-v2.html (GitHub Pages)
 ├── CLAUDE_CODE_PROMPT.md
 └── CONTEXT.md                    # This file
 ```
 
-**Dev workflow:** Edit DEV/ → test by opening HTML directly in browser (proxy URL works from file://) → copy to PROD/ → paste into Google Sites → Publish.
+**Dev workflow:** Edit DEV/ → test by opening HTML directly in browser (proxy URL works from file://) → copy to PROD/ → commit and push to GitHub → GitHub Pages deploys automatically.
+
+**Live URLs:**
+- Kids app: https://asim881.github.io/homework-hub/
+- Parent dashboard: https://asim881.github.io/homework-hub/PROD/parent-dashboard.html
+
+**GitHub repo:** https://github.com/asim881/homework-hub (public)
+**Hosting:** GitHub Pages from main branch / root. index.html redirects to PROD/homework-hub-v2.html.
+**Why GitHub Pages:** Google Sites embedded HTML via a randomly-numbered atari-embeds.googleusercontent.com subdomain that changed every browser tab — incompatible with Family Link whitelisting.
 
 ### Key constants in PROD/homework-hub-v2.html
 ```javascript
@@ -102,14 +113,20 @@ const FALLBACK_API_KEY = ''; // Intentionally empty — proxy is sole API path
 ## 4. Next Steps
 
 ### Immediate (unblocking)
-1. **Redeploy Apps Script** — paste `PROD/apps-script-proxy.js` into script.google.com → Deploy → Manage deployments → Edit → New version → Deploy. This fixes the current "Failed to fetch" error.
-2. **Rotate old Anthropic API key** — go to console.anthropic.com → API Keys → disable `sk-ant-api03-Y89b-Xf_...` → create new key → update `ANTHROPIC_API_KEY` Script Property.
-3. **Update Google Sites** — paste `PROD/homework-hub-v2.html` and `PROD/parent-dashboard.html` into the Sites embeds → Publish.
+1. **Add asim881.github.io to Family Link** — in Family Link app, add `asim881.github.io` to approved sites for Fatima, Rayyan, and Haniya. One-time, never changes.
+2. **Redeploy Apps Script** — paste `PROD/apps-script-proxy.js` into script.google.com → Deploy → Manage deployments → Edit → New version → Deploy. This fixes the current "Failed to fetch" error.
+3. **Rotate old Anthropic API key** — go to console.anthropic.com → API Keys → disable `sk-ant-api03-Y89b-Xf_...` → create new key → update `ANTHROPIC_API_KEY` Script Property.
+
+### Dev workflow going forward
+- Edit DEV/ files → test locally → copy to PROD/ → `git add`, `git commit -m "..."`, `git push`
+- GitHub Pages auto-deploys within ~60 seconds of each push
+- When marking a Notion backlog item Done, paste the short git SHA into the Commit field
 
 ### Backlog (priority order)
-4. **Weekly email summary** (High) — Sunday trigger via Apps Script `MailApp`; sends weekly results for all 3 kids to parents. Still in Backlog.
-5. **Hide future days in kids' view** (Medium) — filter DAYS array to only show up to today's day of week; frontend-only change in `homework-hub-v2.html`.
-6. **Cross-device progress sync** (Medium) — localStorage is per-device; needs server-side session or resume-from-sheet flow.
+4. **Achievement badges** (High) — badges on kid home screen (First Week Done, Perfect Score, etc.)
+5. **Weekly email summary** (Medium) — Sunday trigger via Apps Script `MailApp`; sends weekly results for all 3 kids to parents.
+6. **Hide future days in kids' view** (Medium) — filter DAYS array to only show up to today's day of week; frontend-only change in `homework-hub-v2.html`.
+7. **Cross-device progress sync** (Medium) — localStorage is per-device; needs server-side session or resume-from-sheet flow.
 
 **Full backlog:** https://www.notion.so/5efe8f6e726d4bd0be47ceea3c1f75d9
 
