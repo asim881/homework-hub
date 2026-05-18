@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homework Hub — Architecture</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      padding: 32px 24px 64px;
+    }
+
+    h1 { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #666; margin-bottom: 40px; }
+
+    /* ── Section headings ── */
+    .section-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #555; margin-bottom: 16px;
+    }
+
+    /* ══════════════════════════════════════════
+       ARCHITECTURE DIAGRAM
+    ══════════════════════════════════════════ */
+    .arch {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr 60px 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 0;
+      margin-bottom: 56px;
+      align-items: start;
+    }
+
+    /* ── Layer boxes ── */
+    .layer {
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .layer-title {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    .layer-browser  { background: #1a2035; border-color: #2d4a8a; }
+    .layer-browser .layer-title  { color: #5b8fff; }
+
+    .layer-proxy    { background: #1e1a2e; border-color: #5b3fa0; }
+    .layer-proxy .layer-title    { color: #a78bfa; }
+
+    .layer-services { background: #1a2820; border-color: #2a6645; }
+    .layer-services .layer-title { color: #4ade80; }
+
+    .layer-sheets   { background: #1a2820; border-color: #2a6645; }
+    .layer-sheets .layer-title   { color: #4ade80; }
+
+    /* ── Component cards inside layers ── */
+    .comp {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+    .comp:last-child { margin-bottom: 0; }
+    .comp-name { font-weight: 700; font-size: 0.8rem; margin-bottom: 3px; }
+    .comp-desc { font-size: 0.72rem; color: #888; line-height: 1.4; }
+    .comp-file { font-size: 0.68rem; color: #555; font-family: monospace; margin-top: 4px; }
+    .tag {
+      display: inline-block; font-size: 0.6rem; font-weight: 700;
+      padding: 1px 6px; border-radius: 4px; margin-top: 4px;
+    }
+    .tag-local { background: #1e3a5f; color: #5b9fff; }
+    .tag-cloud { background: #2a1e4f; color: #a78bfa; }
+    .tag-google { background: #1a3a28; color: #4ade80; }
+
+    /* ── Arrows between columns ── */
+    .arrow-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 60px;
+      gap: 4px;
+    }
+    .arrow-line {
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(to bottom, #333, #555);
+      position: relative;
+    }
+    .arrow-line::after {
+      content: '▼';
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #555;
+    }
+    .arrow-line.both::before {
+      content: '▲';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #555;
+    }
+    .arrow-label {
+      font-size: 0.62rem; color: #555; text-align: center;
+      line-height: 1.3; max-width: 56px;
+    }
+
+    /* ── Full-width storage bar ── */
+    .storage-row {
+      grid-column: 1 / -1;
+      margin-top: 20px;
+    }
+    .storage-row .layer {
+      background: #1e1a14;
+      border-color: #5a4a20;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .storage-row .layer-title { color: #fbbf24; grid-column: 1/-1; margin-bottom: 0; }
+
+    /* ══════════════════════════════════════════
+       DATA FLOWS
+    ══════════════════════════════════════════ */
+    .flows {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+    @media (max-width: 700px) { .flows { grid-template-columns: 1fr; } }
+
+    .flow-card {
+      background: #151820;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .flow-title {
+      font-size: 0.82rem; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .flow-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800; flex-shrink: 0;
+    }
+    .flow-steps { list-style: none; }
+    .flow-steps li {
+      font-size: 0.76rem; color: #aaa; padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding-left: 16px; position: relative; line-height: 1.4;
+    }
+    .flow-steps li:last-child { border-bottom: none; }
+    .flow-steps li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: #444;
+    }
+    .hl { color: #fff; font-weight: 600; }
+
+    /* ══════════════════════════════════════════
+       WHY SECTION
+    ══════════════════════════════════════════ */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 700px) { .why-grid { grid-template-columns: 1fr; } }
+
+    .why-card {
+      background: #151820;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .why-card-title {
+      font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; color: #fff;
+    }
+    .why-card-sub { font-size: 0.7rem; color: #555; margin-bottom: 12px; }
+    .why-point {
+      font-size: 0.75rem; color: #aaa; padding: 4px 0 4px 16px;
+      position: relative; line-height: 1.4;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .why-point:last-child { border-bottom: none; }
+    .why-point::before { content: '✓'; position: absolute; left: 0; color: #4ade80; font-size: 0.7rem; }
+    .why-bad {
+      font-size: 0.75rem; color: #777; padding: 4px 0 4px 16px;
+      position: relative; line-height: 1.4;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .why-bad::before { content: '✗'; position: absolute; left: 0; color: #f87171; font-size: 0.7rem; }
+  </style>
+</head>
+<body>
+
+<h1>Homework Hub — Architecture & Data Flow</h1>
+<p class="subtitle">Reference document · Last updated May 2026</p>
+
+<!-- ══════════════════════════════════════
+     SECTION 1: ARCHITECTURE DIAGRAM
+══════════════════════════════════════ -->
+<div class="section-title">System Architecture</div>
+<div class="arch">
+
+  <!-- COL 1: Browser -->
+  <div class="layer layer-browser">
+    <div class="layer-title">Browser (Kids' Chromebook)</div>
+
+    <div class="comp">
+      <div class="comp-name">Homework App</div>
+      <div class="comp-desc">Login screen, 7-day tab view, question display, answer input, results screen</div>
+      <div class="comp-file">homework-hub-v2.html</div>
+      <span class="tag tag-local">Runs locally in browser</span>
+    </div>
+
+    <div class="comp">
+      <div class="comp-name">Parent Dashboard</div>
+      <div class="comp-desc">Kid summary cards, weekly %, day chips, full history table with filters</div>
+      <div class="comp-file">parent-dashboard.html</div>
+      <span class="tag tag-local">Runs locally in browser</span>
+    </div>
+
+    <div class="comp">
+      <div class="comp-name">Google Sites</div>
+      <div class="comp-desc">Hosts both HTML files as iframes — no server needed, works on any Chromebook</div>
+      <span class="tag tag-google">Google</span>
+    </div>
+  </div>
+
+  <!-- ARROW 1→2 -->
+  <div class="arrow-col">
+    <div class="arrow-label">HTTPS POST<br>text/plain JSON</div>
+    <div class="arrow-line both"></div>
+    <div class="arrow-label">JSON response</div>
+  </div>
+
+  <!-- COL 2: Proxy -->
+  <div class="layer layer-proxy">
+    <div class="layer-title">Google Apps Script Proxy</div>
+
+    <div class="comp">
+      <div class="comp-name">doPost() Router</div>
+      <div class="comp-desc">Receives all requests from the browser. Routes by <code style="color:#c4b5fd">action</code> field</div>
+      <div class="comp-file">apps-script-proxy.js</div>
+    </div>
+
+    <div class="comp">
+      <div class="comp-name">handleClaude()</div>
+      <div class="comp-desc">Forwards prompt to Anthropic API using the secret key stored in Script Properties — never exposed to the browser</div>
+    </div>
+
+    <div class="comp">
+      <div class="comp-name">handleSaveProgress()</div>
+      <div class="comp-desc">Writes one session's results to Google Sheets — Overview tab + per-kid tab + weekly summary row</div>
+    </div>
+
+    <div class="comp">
+      <div class="comp-name">handleGetData()</div>
+      <div class="comp-desc">Reads all Overview rows from Sheets and returns as JSON for the parent dashboard</div>
+    </div>
+
+    <span class="tag tag-cloud">Google Cloud · Free tier · No server to manage</span>
+  </div>
+
+  <!-- ARROW 2→3 -->
+  <div class="arrow-col">
+    <div class="arrow-label">HTTPS POST<br>x-api-key header</div>
+    <div class="arrow-line both"></div>
+    <div class="arrow-label">AI response JSON</div>
+  </div>
+
+  <!-- COL 3: External services (stacked) -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="layer layer-services">
+      <div class="layer-title">Anthropic API</div>
+      <div class="comp">
+        <div class="comp-name">Claude Haiku</div>
+        <div class="comp-desc">Used for two tasks:<br>
+          <strong style="color:#ccc">1. Generate</strong> — creates 5 age-appropriate questions per subject per week<br>
+          <strong style="color:#ccc">2. Grade</strong> — scores each answer, gives per-question feedback, returns JSON
+        </div>
+        <div class="comp-file">model: claude-haiku-4-5-20251001</div>
+        <span class="tag tag-cloud">Paid per token · ~$0.001/session</span>
+      </div>
+    </div>
+
+    <div class="layer layer-sheets">
+      <div class="layer-title">Google Sheets</div>
+      <div class="comp">
+        <div class="comp-name">Overview Tab</div>
+        <div class="comp-desc">One row per day submitted. All kids. Newest at top. Weekly summary rows auto-inserted.</div>
+      </div>
+      <div class="comp">
+        <div class="comp-name">Fatima / Rayyan / Haniya Tabs</div>
+        <div class="comp-desc">One row per question — includes the exact question, kid's answer, score, and AI feedback</div>
+      </div>
+      <span class="tag tag-google">Google · Free · Shareable with wife</span>
+    </div>
+  </div>
+
+  <!-- Storage row -->
+  <div class="storage-row">
+    <div class="layer" style="background:#1a1a14;border-color:#4a3a10">
+      <div class="layer-title" style="color:#fbbf24;grid-column:1/-1">Browser localStorage — Client-side only, per device</div>
+      <div class="comp">
+        <div class="comp-name">hwProgress</div>
+        <div class="comp-desc">Which days have been completed, scores per kid per week</div>
+      </div>
+      <div class="comp">
+        <div class="comp-name">assign-{kid}-w{week}-d{day}</div>
+        <div class="comp-desc">Cached assignment JSON — avoids calling AI twice for the same session</div>
+      </div>
+      <div class="comp">
+        <div class="comp-name">hwSyncQueue</div>
+        <div class="comp-desc">Pending Sheets syncs — retried automatically on next app open if a previous sync failed</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SECTION 2: DATA FLOWS
+══════════════════════════════════════ -->
+<div class="section-title">Key Data Flows</div>
+<div class="flows">
+
+  <div class="flow-card">
+    <div class="flow-title">
+      <div class="flow-num" style="background:#1e3a5f;color:#5b9fff">1</div>
+      Homework Generation
+    </div>
+    <ul class="flow-steps">
+      <li>Kid selects their name and clicks a <span class="hl">day tab</span></li>
+      <li>App checks <span class="hl">localStorage</span> — if assignment already cached, skip API call</li>
+      <li>If not cached: POST to <span class="hl">Apps Script</span> with a prompt (kid name, grade, subject, week number)</li>
+      <li>Apps Script POSTs to <span class="hl">Anthropic /v1/messages</span> with secret API key in header</li>
+      <li>Claude Haiku returns <span class="hl">5 questions</span> as structured JSON</li>
+      <li>Apps Script relays response back to browser</li>
+      <li>App <span class="hl">caches in localStorage</span> and displays questions to kid</li>
+    </ul>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-title">
+      <div class="flow-num" style="background:#2a1e4f;color:#a78bfa">2</div>
+      Answer Grading
+    </div>
+    <ul class="flow-steps">
+      <li>Kid types answers and clicks <span class="hl">Submit</span></li>
+      <li>App bundles all 5 questions + kid's answers into a grading prompt</li>
+      <li>POST to <span class="hl">Apps Script</span> (no action field = Claude call)</li>
+      <li>Apps Script POSTs to <span class="hl">Anthropic API</span> — asks Claude to score each answer and give feedback</li>
+      <li>Response includes <span class="hl">per-question score + feedback text</span></li>
+      <li>App displays results screen with total score and feedback per question</li>
+      <li>Grading result immediately triggers the <span class="hl">Progress Sync</span> flow below</li>
+    </ul>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-title">
+      <div class="flow-num" style="background:#1a3a28;color:#4ade80">3</div>
+      Progress Sync to Sheets
+    </div>
+    <ul class="flow-steps">
+      <li>After grading, app builds a <span class="hl">saveProgress payload</span> (kid, week, day, subject, score, all questions)</li>
+      <li>Payload added to <span class="hl">hwSyncQueue</span> in localStorage (ensures no data loss if offline)</li>
+      <li>POST to <span class="hl">Apps Script</span> with <code style="color:#4ade80">action: "saveProgress"</code></li>
+      <li>Apps Script writes one row to <span class="hl">Overview tab</span> (summary)</li>
+      <li>Apps Script writes one row per question to <span class="hl">kid's own tab</span></li>
+      <li>If all 7 days done for the week, <span class="hl">weekly summary row</span> auto-inserted at top</li>
+      <li>On success, item removed from sync queue</li>
+    </ul>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-title">
+      <div class="flow-num" style="background:#3a1e20;color:#f87171">4</div>
+      Parent Dashboard Load
+    </div>
+    <ul class="flow-steps">
+      <li>Parent opens <span class="hl">parent-dashboard.html</span> in browser</li>
+      <li>POST to <span class="hl">Apps Script</span> with <code style="color:#f87171">action: "getData"</code></li>
+      <li>Apps Script reads all rows from <span class="hl">Overview tab</span> in Sheets</li>
+      <li>Returns array of row objects as <span class="hl">JSON</span></li>
+      <li>Dashboard filters out weekly summary rows, finds <span class="hl">current week</span></li>
+      <li>Renders <span class="hl">kid summary cards</span> (current week %, day chips) + full history table</li>
+      <li>Auto-refreshes every <span class="hl">2 minutes</span> — no manual reload needed</li>
+    </ul>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SECTION 3: WHY EACH COMPONENT
+══════════════════════════════════════ -->
+<div class="section-title">Why Each Component — Design Decisions</div>
+<div class="why-grid">
+
+  <div class="why-card">
+    <div class="why-card-title">Why Google Apps Script?</div>
+    <div class="why-card-sub">The most important architectural decision</div>
+    <div class="why-point">API keys can't be stored safely in browser HTML — anyone can View Source</div>
+    <div class="why-point">Apps Script runs server-side on Google's infrastructure — API key never leaves the server</div>
+    <div class="why-point">Free with a Google account — no AWS/Heroku/VPS needed</div>
+    <div class="why-point">Has native SpreadsheetApp access — writing to Sheets requires no extra OAuth setup</div>
+    <div class="why-point">Deploys in minutes as a public HTTPS endpoint</div>
+    <div class="why-bad">Alternative (direct browser API calls) would expose the key in HTML source</div>
+    <div class="why-bad">Alternative (Node.js server) would need hosting, deployment, and maintenance</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-card-title">Why Google Sheets?</div>
+    <div class="why-card-sub">Progress storage and parent visibility</div>
+    <div class="why-point">Zero setup for parents — they already use Google Sheets</div>
+    <div class="why-point">Shareable with wife via standard Google sharing — no app login needed</div>
+    <div class="why-point">Apps Script can write to Sheets natively without extra API auth</div>
+    <div class="why-point">Free, no database to manage or back up</div>
+    <div class="why-point">Structured enough for the parent dashboard to query</div>
+    <div class="why-bad">Alternative (Firestore/Supabase) would need separate auth and cost money</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-card-title">Why a Single HTML File?</div>
+    <div class="why-card-sub">Simplicity and Google Sites compatibility</div>
+    <div class="why-point">Google Sites only supports HTML embeds — no npm, no build tools</div>
+    <div class="why-point">No deployment pipeline — edit the file, copy-paste into Sites</div>
+    <div class="why-point">Works on any Chromebook out of the box</div>
+    <div class="why-point">Easy to share, inspect, and modify in future</div>
+    <div class="why-bad">Alternative (React/Next.js app) would need a host, domain, and build process</div>
+    <div class="why-bad">Alternative (Google Sites native) has very limited interactivity</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-card-title">Why Claude Haiku?</div>
+    <div class="why-card-sub">AI model selection</div>
+    <div class="why-point">Fastest and cheapest Claude model — suitable for real-time homework sessions</div>
+    <div class="why-point">Smart enough to generate age-appropriate questions and grade answers accurately</div>
+    <div class="why-point">Questions vary every week — kids can't memorise answers</div>
+    <div class="why-point">Per-question feedback teaches kids why they got something wrong</div>
+    <div class="why-bad">Alternative (GPT-4) costs more and is slower for this use case</div>
+    <div class="why-bad">Alternative (static question banks) require manual curation and don't adapt</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-card-title">Why localStorage?</div>
+    <div class="why-card-sub">Client-side state management</div>
+    <div class="why-point">Instant reads and writes — no network call needed to check if homework is done</div>
+    <div class="why-point">Assignment caching avoids duplicate AI calls (and cost) if kid revisits a tab</div>
+    <div class="why-point">Sync queue ensures progress isn't lost if Sheets write fails</div>
+    <div class="why-bad">Limitation: per-device only — switching Chromebooks loses local progress</div>
+    <div class="why-bad">Backlog item: cross-device sync via Sheets session state</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-card-title">Why Google Sites?</div>
+    <div class="why-card-sub">Hosting</div>
+    <div class="why-point">Free, no domain or hosting costs</div>
+    <div class="why-point">Kids access it like any website — just a bookmark</div>
+    <div class="why-point">Works within Family Link approved sites</div>
+    <div class="why-point">Shareable link works for wife and any device</div>
+    <div class="why-bad">Limitation: HTML embed size constraints (iframe height fixed)</div>
+    <div class="why-bad">Limitation: can't run server-side code — hence the Apps Script proxy</div>
+  </div>
+
+</div>
+
+</body>
+</html>
