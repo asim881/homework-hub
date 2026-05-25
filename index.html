@@ -526,9 +526,9 @@ function startHomework() {
   loadProgress();
   showScreen('app-screen');
   setupAppHeader();
-  renderDayTabs();
   const today = getCurrentDayOfWeek();
   currentDay = today;
+  renderDayTabs();
   renderDay(currentDay);
   drainSyncQueue();
 }
@@ -590,12 +590,12 @@ function buildGenerationPrompt(kid, kidInfo, dayInfo, week, weaknesses, topicHin
   const subjectGuides = {
     Math: {
       Fatima: `Grade 5 Ontario Math. Week ${week}. Topics rotate: fractions, decimals, geometry, patterning, data management. Vary from previous weeks. Include 4 questions + 1 challenge. Mix computation and word problems.`,
-      Rayyan: `Grade 5 Ontario Math, stretch level. Week ${week}. Same topic as Fatima but harder: more multi-step word problems, stretch question requires creative problem-making. Include 4 questions + 1 self-created problem challenge.`,
+      Rayyan: `Grade 5 Ontario Math, stretch level. Week ${week}. Rayyane topic as Fatima but harder: more multi-step word problems, stretch question requires creative problem-making. Include 4 questions + 1 self-created problem challenge.`,
       Haniya: `Grade 4 Ontario Math. Week ${week}. Topics rotate: multiplication, division, fractions intro, measurement, geometry. Include 4 questions + 1 challenge. Use concrete familiar scenarios (animals, food, school).`
     },
     English: {
       Fatima: `Grade 5 English. Week ${week}. Alternate between: comprehension+inference, creative writing, vocabulary in context, persuasive writing. Write a short passage (3-5 sentences) and ask 4 questions. Questions should progress from literal to inferential to creative.`,
-      Rayyan: `Grade 5 English, argument focus. Week ${week}. Same passage as would be given to Fatima but different questions emphasizing evidence, argument, and perspective-taking. 3 questions, last one is a rewrite/extension.`,
+      Rayyan: `Grade 5 English, argument focus. Week ${week}. Rayyane passage as would be given to Fatima but different questions emphasizing evidence, argument, and perspective-taking. 3 questions, last one is a rewrite/extension.`,
       Haniya: `Grade 4 English, scaffolded for comprehension difficulty. Week ${week}. Short passage (2-4 sentences), simple familiar scenario. 5 questions: Q1-2 literal retrieval, Q3-4 inference with sentence starters provided, Q5 creative personal response. Do NOT use complex vocabulary.`
     },
     Computer: {
@@ -610,7 +610,7 @@ function buildGenerationPrompt(kid, kidInfo, dayInfo, week, weaknesses, topicHin
     },
     'Social Studies': {
       Fatima: `Grade 5 Ontario Social Studies. Week ${week}. Rotate topics: government and responsible citizenship, Indigenous perspectives and contributions, world regions, economic systems, Canadian identity and heritage. Include: one fact-recall, one cause-and-effect or analysis, one perspective-taking question, one personal opinion/connection question.`,
-      Rayyan: `Grade 5 Ontario Social Studies, analytical focus. Week ${week}. Same topic rotation as Fatima but questions emphasise evidence, argument and debate. Include: fact question, "what evidence supports", "consider two different perspectives", "what would you change and why".`,
+      Rayyan: `Grade 5 Ontario Social Studies, analytical focus. Week ${week}. Rayyane topic rotation as Fatima but questions emphasise evidence, argument and debate. Include: fact question, "what evidence supports", "consider two different perspectives", "what would you change and why".`,
       Haniya: `Grade 4 Ontario Social Studies, scaffolded. Week ${week}. Topics: communities in Canada and around the world, provincial and local government, Indigenous peoples of Canada, Canadian geography (provinces, landforms, regions). Simple language, familiar concrete examples. Include: one fact question, one "why do you think… (hint provided)", one place or map question, one personal connection question.`
     },
     'Math+Finance': {
