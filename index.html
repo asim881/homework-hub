@@ -438,15 +438,16 @@
 
 <script>
 // ═══════════════════════════════════════════════════════
-// CONFIGURATION — UPDATE THESE TWO VALUES
+// CONFIGURATION — UPDATE THESE VALUES
 // ═══════════════════════════════════════════════════════
 
-// Replace with your Google Apps Script Web App URL after deployment
-// Leave as empty string '' to use direct API (requires key entry)
+// Cloudflare Worker URL — handles Claude API calls (never expires)
+const CLAUDE_URL = 'https://homework-hub.asim-aijaz.workers.dev';
+
+// Google Apps Script URL — handles Google Sheets sync only
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbxB-SklnHp7Q5XwnOSD_mbGSYDAY9s9ccFlQdPIpSZ6qhrWYpP6z-Thd5GEPTjI8JHyRg/exec';
 
-// Only used if PROXY_URL is empty (fallback direct mode)
-// In production leave this empty and use the proxy
+// Only used if both CLAUDE_URL and PROXY_URL are empty (fallback direct mode)
 const FALLBACK_API_KEY = '';
 
 // ═══════════════════════════════════════════════════════
@@ -678,9 +679,9 @@ async function fetchTopicHint(kid) {
 }
 
 async function callClaude(prompt, maxTokens = 1000) {
-  if (PROXY_URL) {
-    // Route through Google Apps Script proxy (API key stays server-side)
-    const response = await fetch(PROXY_URL, {
+  const claudeEndpoint = CLAUDE_URL || PROXY_URL;
+  if (claudeEndpoint) {
+    const response = await fetch(claudeEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ prompt, max_tokens: maxTokens })
