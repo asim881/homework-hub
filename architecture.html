@@ -208,7 +208,7 @@
 <body>
 
 <h1>Homework Hub — Architecture & Data Flow</h1>
-<p class="subtitle">Reference document · Last updated 2026-05-18 · Hosted on GitHub Pages</p>
+<p class="subtitle">Reference document · Last updated 2026-05-30 · Hosted on GitHub Pages</p>
 
 <!-- ══════════════════════════════════════
      SECTION 1: ARCHITECTURE DIAGRAM
@@ -248,32 +248,31 @@
     <div class="arrow-label">JSON response</div>
   </div>
 
-  <!-- COL 2: Proxy -->
-  <div class="layer layer-proxy">
-    <div class="layer-title">Google Apps Script Proxy</div>
+  <!-- COL 2: Proxy (split) -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="layer layer-proxy">
+      <div class="layer-title">Cloudflare Worker</div>
 
-    <div class="comp">
-      <div class="comp-name">doPost() Router</div>
-      <div class="comp-desc">Receives all requests from the browser. Routes by <code style="color:#c4b5fd">action</code> field</div>
-      <div class="comp-file">apps-script-proxy.js</div>
+      <div class="comp">
+        <div class="comp-name">Claude Proxy</div>
+        <div class="comp-desc">Receives question/grading requests from the browser. Forwards to Anthropic API using encrypted secret — no OAuth, never expires.</div>
+        <div class="comp-file">cloudflare-worker.js · homework-hub.asim-aijaz.workers.dev</div>
+      </div>
+
+      <span class="tag tag-cloud">Cloudflare · Free · Never re-authorizes</span>
     </div>
 
-    <div class="comp">
-      <div class="comp-name">handleClaude()</div>
-      <div class="comp-desc">Forwards prompt to Anthropic API using the secret key stored in Script Properties — never exposed to the browser</div>
-    </div>
+    <div class="layer" style="background:#1e2a1a;border-color:#3a6030;border-radius:14px;padding:20px;border:1px solid rgba(255,255,255,0.07)">
+      <div class="layer-title" style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;color:#86efac">Google Apps Script</div>
 
-    <div class="comp">
-      <div class="comp-name">handleSaveProgress()</div>
-      <div class="comp-desc">Writes one session's results to Google Sheets — Overview tab + per-kid tab + weekly summary row</div>
-    </div>
+      <div class="comp">
+        <div class="comp-name">Sheets Proxy</div>
+        <div class="comp-desc">Handles Sheets-only operations: saveProgress, getData, getKidData, saveSettings, getSettings. No longer handles Claude calls.</div>
+        <div class="comp-file">apps-script-proxy.js</div>
+      </div>
 
-    <div class="comp">
-      <div class="comp-name">handleGetData()</div>
-      <div class="comp-desc">Reads all Overview rows from Sheets and returns as JSON for the parent dashboard</div>
+      <span class="tag tag-google">Google Cloud · Free · Native Sheets access</span>
     </div>
-
-    <span class="tag tag-cloud">Google Cloud · Free tier · No server to manage</span>
   </div>
 
   <!-- ARROW 2→3 -->
@@ -348,10 +347,10 @@
     <ul class="flow-steps">
       <li>Kid selects their name and clicks a <span class="hl">day tab</span></li>
       <li>App checks <span class="hl">localStorage</span> — if assignment already cached, skip API call</li>
-      <li>If not cached: POST to <span class="hl">Apps Script</span> with a prompt (kid name, grade, subject, week number)</li>
-      <li>Apps Script POSTs to <span class="hl">Anthropic /v1/messages</span> with secret API key in header</li>
+      <li>If not cached: POST to <span class="hl">Cloudflare Worker</span> with a prompt (kid name, grade, subject, week number)</li>
+      <li>Worker POSTs to <span class="hl">Anthropic /v1/messages</span> with encrypted API key secret</li>
       <li>Claude Haiku returns <span class="hl">5 questions</span> as structured JSON</li>
-      <li>Apps Script relays response back to browser</li>
+      <li>Worker relays response back to browser</li>
       <li>App <span class="hl">caches in localStorage</span> and displays questions to kid</li>
     </ul>
   </div>
@@ -364,8 +363,8 @@
     <ul class="flow-steps">
       <li>Kid types answers and clicks <span class="hl">Submit</span></li>
       <li>App bundles all 5 questions + kid's answers into a grading prompt</li>
-      <li>POST to <span class="hl">Apps Script</span> (no action field = Claude call)</li>
-      <li>Apps Script POSTs to <span class="hl">Anthropic API</span> — asks Claude to score each answer and give feedback</li>
+      <li>POST to <span class="hl">Cloudflare Worker</span> (no action field = Claude call)</li>
+      <li>Worker POSTs to <span class="hl">Anthropic API</span> — asks Claude to score each answer and give feedback</li>
       <li>Response includes <span class="hl">per-question score + feedback text</span></li>
       <li>App displays results screen with total score and feedback per question</li>
       <li>Grading result immediately triggers the <span class="hl">Progress Sync</span> flow below</li>
@@ -414,15 +413,14 @@
 <div class="why-grid">
 
   <div class="why-card">
-    <div class="why-card-title">Why Google Apps Script?</div>
-    <div class="why-card-sub">The most important architectural decision</div>
-    <div class="why-point">API keys can't be stored safely in browser HTML — anyone can View Source</div>
-    <div class="why-point">Apps Script runs server-side on Google's infrastructure — API key never leaves the server</div>
-    <div class="why-point">Free with a Google account — no AWS/Heroku/VPS needed</div>
-    <div class="why-point">Has native SpreadsheetApp access — writing to Sheets requires no extra OAuth setup</div>
-    <div class="why-point">Deploys in minutes as a public HTTPS endpoint</div>
-    <div class="why-bad">Alternative (direct browser API calls) would expose the key in HTML source</div>
-    <div class="why-bad">Alternative (Node.js server) would need hosting, deployment, and maintenance</div>
+    <div class="why-card-title">Why Cloudflare Worker for Claude?</div>
+    <div class="why-card-sub">Replaced Apps Script as Claude proxy — May 2026</div>
+    <div class="why-point">API key stored as encrypted Worker secret — never exposed to the browser</div>
+    <div class="why-point">No OAuth — never requires re-authorization, never expires</div>
+    <div class="why-point">Free tier (100k req/day) — far exceeds family app usage</div>
+    <div class="why-point">Globally distributed — fast response times</div>
+    <div class="why-bad">Apps Script OAuth expired weekly, blocking question generation and losing kids' homework</div>
+    <div class="why-bad">Apps Script retained for Sheets sync only — it has native SpreadsheetApp access that Workers don't</div>
   </div>
 
   <div class="why-card">
